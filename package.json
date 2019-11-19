@@ -1,9 +1,10 @@
 {
-  "name": "@akolos/simple-online-game-synchronization-framework-demo",
+  "name": "@akolos/ts-simple-online-game-synchronization-demo",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
+    "start": "webpack-dev-server",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -15,5 +16,31 @@
   "bugs": {
     "url": "https://github.com/andrewkolos/simple-online-game-synchronization-framework-demo/issues"
   },
-  "homepage": "https://github.com/andrewkolos/simple-online-game-synchronization-framework-demo#readme"
+  "homepage": "https://github.com/andrewkolos/simple-online-game-synchronization-framework-demo#readme",
+  "dependencies": {
+    "@akolos/ts-client-server-game-synchronization": "^0.1.67",
+    "react": "^16.11.0",
+    "react-dom": "^16.11.0",
+    "react-router-dom": "^5.1.2",
+    "typed-event-emitter": "^2.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^12.12.7",
+    "@types/react": "^16.9.11",
+    "@types/react-dom": "^16.9.4",
+    "@types/react-router-dom": "^5.1.2",
+    "awesome-typescript-loader": "^5.2.1",
+    "css-loader": "^3.2.0",
+    "http-server": "^0.11.1",
+    "node-sass": "^4.13.0",
+    "sass-loader": "^8.0.0",
+    "source-map-loader": "^0.2.4",
+    "style-loader": "^1.0.0",
+    "tslint": "^5.20.1",
+    "tslint-clean-code": "^0.2.10",
+    "typescript": "^3.7.2",
+    "webpack": "^4.41.2",
+    "webpack-cli": "^3.3.10",
+    "webpack-dev-server": "^3.9.0"
+  }
 }
