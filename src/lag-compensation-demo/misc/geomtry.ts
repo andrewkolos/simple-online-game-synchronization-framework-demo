@@ -23,11 +23,11 @@ export namespace Point {
   export function rotateAboutOrigin(p: Point, rads: number) {
     return {
       x: p.x * Math.cos(rads) - p.y * Math.sin(rads),
-      y: p.x * Math.sin(rads) - p.y * Math.cos(rads),
+      y: p.x * Math.sin(rads) + p.y * Math.cos(rads),
     };
   }
 
-  export function rotateAboutPoint(p: Point, about: Point, rads: number) {
+  export function rotateAboutPoint(p: Point, rads: number, about: Point) {
     const reOriginAtOrigin = { x: p.x - about.x, y: p.y - about.y };
     const rotatedAboutOrigin = rotateAboutOrigin(reOriginAtOrigin, rads);
     const translatedBack = { x: rotatedAboutOrigin.x + about.x, y: rotatedAboutOrigin.y + about.y };
@@ -121,7 +121,7 @@ export namespace Polygon {
     const center = findCenter(polygon);
 
     return {
-      points: points.map((p) => Point.rotateAboutPoint(p, center, rads)),
+      points: points.map((p) => Point.rotateAboutPoint(p, rads, center)),
     };
   }
 

@@ -34,7 +34,7 @@ export const createKeyboardLcDemoInputCollector = (keyMappings: LcKeyboardDemoIn
     }
 
     if (input.direction !== LcMoveInputDirection.None || input.rotation !== LcRotateInputDirection.None) {
-      const targetEntityId = entities.filter(e => e.local)[0].id;
+      const targetEntityId = entities.filter((e) => e.local)[0].id;
       const targetedInput: EntityTargetedInput<LcDemoPlayerInput> = {
         entityId: targetEntityId,
         input,

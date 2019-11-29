@@ -6,6 +6,6 @@ export interface LcDemoGameConfig {
 
 export const basicLcDemoGameConfig: LcDemoGameConfig = {
   playFieldHeight: 150,
-  playFieldWidth: 900,
+  playFieldWidth: 200,
   respawnTimeMs: 3000,
 };

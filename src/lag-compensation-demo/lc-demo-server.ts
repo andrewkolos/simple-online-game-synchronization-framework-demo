@@ -29,6 +29,7 @@ export class LcDemoGameServer extends EventEmitter {
 
   public readonly onUpdated = this.registerEvent<(gameState: LcDemoGameState) => void>();
 
+  private updateRateHz: number;
   private readonly entitySyncer: ServerEntitySyncer<LcDemoPlayerInput, LcDemoPlayerState>;
   private readonly game: LcDemoGameState;
 
@@ -49,12 +50,15 @@ export class LcDemoGameServer extends EventEmitter {
         }
       },
       inputApplicator: lcDemoPlayerInputApplicator,
-      inputValidator: () => true,
+      inputValidator: (entity: Entity<LcDemoPlayerState>, _input: LcDemoPlayerInput) => {
+        return entity.state.timeUntilSpawnMs <= 0;
+      },
     });
   }
 
   public start(updateRateHz: number) {
-    this.loop = new IntervalTaskRunner(() => this.update(), Interval.fromHz(updateRateHz));
+    this.loop = new IntervalTaskRunner(() => this.update(), Interval.fromHz(updateRateHz)).start();
+    this.updateRateHz = updateRateHz;
   }
 
   public stop() {
@@ -73,8 +77,9 @@ export class LcDemoGameServer extends EventEmitter {
 
   private update() {
     const updatedEntities = this.entitySyncer.synchronize() as Array<Entity<LcDemoPlayerState>>;
-    this.game.performLaserCollisions();
     writeLcDemoEntityStatesToGame(updatedEntities, this.game);
+    this.game.advanceSpawnTimers(Interval.fromHz(this.updateRateHz).ms);
+    this.game.performLaserCollisions();
     this.emit(this.onUpdated, this.game);
   }
 }

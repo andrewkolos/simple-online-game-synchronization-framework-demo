@@ -52,9 +52,9 @@ export class LcDemoGameState {
     this.playfield.width = config.playFieldWidth;
     this.respawnTimeMs = config.respawnTimeMs;
     const defaultState = (pid: PlayerId): LcDemoPlayerState => ({
-      rotationRads: 0,
+      rotationRads: pid === PlayerId.P1 ? 0 : Math.PI,
       timeUntilSpawnMs: 0,
-      yOffset: pid === PlayerId.P1 ? this.config.playFieldHeight / 2 : - this.config.playFieldHeight / 2,
+      yOffset: pid === PlayerId.P1 ? this.config.playFieldHeight / 8 : - this.config.playFieldHeight / 8,
     });
     this.player1 = defaultState(PlayerId.P1);
     this.player2 = defaultState(PlayerId.P2);
@@ -63,9 +63,10 @@ export class LcDemoGameState {
   public getLaser(player: PlayerId) {
     const physicalPlayer = PlayerId.playerMux(this.player1, this.player2, player);
     const geometry = this.getPlayerGeometry(physicalPlayer, player, this.playfield);
+    const center = Polygon.findCenter(geometry.asOrderedPolygon());
     const laserOrigin = geometry.tipPoint;
-    const laserEndPreRotation = Point.translate(laserOrigin, { x: this.config.playFieldWidth, y: 0 });
-    const laserEnd = Point.rotateAboutOrigin(laserEndPreRotation, physicalPlayer.rotationRads);
+    const laserEndPreRotation = Point.translate(laserOrigin, { x: this.config.playFieldWidth * 1.25, y: 0 });
+    const laserEnd = Point.rotateAboutPoint(laserEndPreRotation, physicalPlayer.rotationRads, center);
     return {
       laserOrigin,
       laserEnd,
@@ -77,20 +78,21 @@ export class LcDemoGameState {
 
   public getPlayerGeometry(pState: LcDemoPlayerState, player: PlayerId, playfield: { height: number, width: number }): PlayerGeometry {
     const baseGeometry = (() => {
-      const distanceCenterToTriangleBase = this.config.playFieldWidth / 100;
-      const distanceCenterBaseToAdjPoint = this.config.playFieldHeight / 10;
+      const unit = this.config.playFieldWidth / 30;
+      const distanceCenterBaseToAdjPoint = this.config.playFieldHeight / 20;
 
       return {
-        rearLeftSidePoint: { x: -distanceCenterToTriangleBase, y: distanceCenterBaseToAdjPoint },
-        rearRightSidePoint: { x: -distanceCenterToTriangleBase, y: -distanceCenterBaseToAdjPoint },
-        tipPoint: { x: distanceCenterToTriangleBase, y: 0 },
+        rearLeftSidePoint: { x: -unit, y: distanceCenterBaseToAdjPoint },
+        rearRightSidePoint: { x: -unit, y: -distanceCenterBaseToAdjPoint },
+        tipPoint: { x: unit * 2, y: 0 },
         asOrderedPolygon(): Polygon {
           return { points: [this.rearLeftSidePoint, this.rearRightSidePoint, this.tipPoint] };
         },
       };
     })();
 
-    const xPos = player === PlayerId.P1 ? - baseGeometry.rearLeftSidePoint.x * 2 : playfield.width + baseGeometry.rearLeftSidePoint.x * 2;
+    const bBox = Polygon.computeBoundingBox(baseGeometry.asOrderedPolygon());
+    const xPos = player === PlayerId.P1 ? bBox.width : playfield.width - bBox.width * 1.25;
     const defaultYPos = playfield.height / 2;
 
     const translated = Point.translate(baseGeometry.asOrderedPolygon().points, {
@@ -112,7 +114,7 @@ export class LcDemoGameState {
   public advanceSpawnTimers(dtMs: number) {
     [this.player1, this.player2].forEach((p) => {
       if (p.timeUntilSpawnMs <= 0) return;
-      p.timeUntilSpawnMs = Math.max(p.timeUntilSpawnMs - dtMs);
+      p.timeUntilSpawnMs = Math.max(p.timeUntilSpawnMs - dtMs, 0);
     });
   }
 
@@ -141,13 +143,13 @@ export class LcDemoGameState {
       if (this.isLaserHittingOpponent(p.id)) {
         const opponent = PlayerId.opposite(p.id);
         const oppPlayer = this.getPlayerFromId(opponent);
-        if (oppPlayer.timeUntilSpawnMs > 0) {
+        if (oppPlayer.timeUntilSpawnMs <= 0) {
           this.destroyPlayer(opponent);
 
           if (opponent === PlayerId.P1) {
             collisionResult.player1Destroyed = true;
           } else {
-            collisionResult.player2Destroyed = false;
+            collisionResult.player2Destroyed = true;
           }
         }
       }

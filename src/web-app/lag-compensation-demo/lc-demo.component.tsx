@@ -10,7 +10,7 @@ import { LcDemoServerRenderer } from './lc-demo-server-renderer';
 
 const SERVER_SYNC_UPDATE_RATE = 60;
 const CLIENT_UPDATE_RATE = 60;
-const CLIENT_LATENCY_MS = 100;
+const CLIENT_LATENCY_MS = 500;
 
 export class LcDemo extends React.Component {
 
@@ -30,8 +30,8 @@ export class LcDemo extends React.Component {
     const client1 = createClient({
       moveUp: 87,
       moveDown: 83,
-      rotateClockwise: 68,
-      rotateCounterclockwise: 65,
+      rotateClockwise: 65,
+      rotateCounterclockwise: 68,
     }, network);
     const client2 = createClient({
       moveUp: 38,

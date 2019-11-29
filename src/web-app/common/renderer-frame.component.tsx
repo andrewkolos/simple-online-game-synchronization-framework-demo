@@ -20,6 +20,8 @@ export class RendererFrame extends React.Component<RendererFrameProps> {
       border: `5px solid ${this.props.borderColor}`,
       padding: '15px',
       margin: '15px',
+      display: 'inline-block',
+      verticalAlign: 'top',
     };
 
     return (

@@ -1,12 +1,11 @@
 import React, { RefObject } from 'react';
 import { LcDemoGameState, PlayerId } from '../../lag-compensation-demo/lc-demo-game-state';
 import { Point, Polygon } from '../../lag-compensation-demo/misc/geomtry';
-import { lineSegment } from '../common/geometry-drawer';
-import { LcDemoEntityId } from '../../lag-compensation-demo/lc-demo-entity-ids';
+import { GeometryDrawing } from '../common/geometry-drawer';
 
 interface DemoGameRendererProps {
   game: LcDemoGameState;
-};
+}
 
 export class LcDemoGameRendererComponent extends React.Component<DemoGameRendererProps> {
 
@@ -17,8 +16,8 @@ export class LcDemoGameRendererComponent extends React.Component<DemoGameRendere
     this.canvasRef = React.createRef<HTMLCanvasElement>();
   }
 
-  public componentDidMount() {
-    const { game } = this.props;
+  public componentDidUpdate(props: DemoGameRendererProps) {
+    const { game } = props;
     const canvas = this.canvasRef.current;
 
     if (canvas == null) return;
@@ -28,16 +27,16 @@ export class LcDemoGameRendererComponent extends React.Component<DemoGameRendere
 
     const { height: playfieldHeight, width: playfieldWidth } = game.playfield;
     ctx.fillStyle = 'gray';
-    ctx.fillRect(0, 0, playfieldHeight, playfieldWidth);
+    ctx.fillRect(0, 0, playfieldWidth, playfieldHeight);
 
     const playerColors = {
-      [LcDemoEntityId.P1]: 'blue',
-      [LcDemoEntityId.P2]: 'red',
+      [PlayerId.P1]: 'blue',
+      [PlayerId.P2]: 'red',
     };
 
     const laserColors = {
-      [LcDemoEntityId.P1]: 'cyan',
-      [LcDemoEntityId.P2]: 'yellow',
+      [PlayerId.P1]: 'cyan',
+      [PlayerId.P2]: 'yellow',
     };
 
     [{ id: PlayerId.P1, player: game.player1 }, { id: PlayerId.P2, player: game.player2 }].forEach((o) => {
@@ -45,26 +44,32 @@ export class LcDemoGameRendererComponent extends React.Component<DemoGameRendere
       const geometry = game.getPlayerGeometry(player, id, game.playfield).asOrderedPolygon();
       const laser = game.getLaser(id).asSegment();
 
-      (function renderPlayer() {
-        if (player.timeUntilSpawnMs > 0) {
-          ctx.globalAlpha = 0.2;
-        }
-        ctx.fillStyle = (playerColors as any)[id];
-        ctx.fill();
-        ctx.lineWidth = 5;
-        ctx.strokeStyle = 'dark' + (playerColors as any)[id];
-        ctx.stroke();
-        ctx.globalAlpha = 1.0;
-      })();
-
       (function renderLaser() {
-        if (player.timeUntilSpawnMs === 0) {
-          lineSegment(ctx, screenCoords(laser.p), screenCoords(laser.q));
+        if (player.timeUntilSpawnMs <= 0) {
+          GeometryDrawing.pathSegment(ctx, screenCoords(laser.p), screenCoords(laser.q));
           ctx.lineWidth = 1;
           ctx.strokeStyle = (laserColors as any)[id];
           ctx.stroke();
         }
       })();
+      (function renderPlayer() {
+        if (player.timeUntilSpawnMs > 0) {
+          ctx.globalAlpha = 0.2;
+        }
+        GeometryDrawing.pathSegments(ctx, screenCoords(geometry.points));
+        ctx.fillStyle = (playerColors as any)[id];
+        ctx.lineWidth = 2;
+        ctx.strokeStyle = 'dark' + (playerColors as any)[id];
+        // https://stackoverflow.com/questions/36615592/canvas-inner-stroke
+        ctx.save();
+        ctx.clip();
+        ctx.lineWidth *= 2;
+        ctx.fill();
+        ctx.stroke();
+        ctx.restore();
+        ctx.globalAlpha = 1.0;
+      })();
+
 
       (function renderSpawnTimer() {
         if (player.timeUntilSpawnMs > 0) {
@@ -77,12 +82,12 @@ export class LcDemoGameRendererComponent extends React.Component<DemoGameRendere
 
           ctx.beginPath();
           ctx.strokeStyle = 'rgb(221,221,221)';
-          ctx.arc(pLoc.x, pLoc.y, maxDimension, 0, 2 * Math.PI);
+          ctx.arc(pLoc.x, screenCoords(pLoc).y, maxDimension, 0, 2 * Math.PI);
           ctx.stroke();
 
           ctx.beginPath();
-          ctx.strokeStyle = 'rgb(255, 65, 54)';
-          ctx.arc(pLoc.x, pLoc.y, maxDimension, 3 * Math.PI / 2, percentToRad(percentTimeUntilSpawn));
+          ctx.strokeStyle = 'rgb(65, 255, 65)';
+          ctx.arc(pLoc.x, screenCoords(pLoc).y, maxDimension, 3 * Math.PI / 2, percentToRad(percentTimeUntilSpawn));
           ctx.stroke();
         }
       })();
@@ -108,7 +113,7 @@ export class LcDemoGameRendererComponent extends React.Component<DemoGameRendere
 }
 
 function percentToRad(percent: number): number {
-  return 3 * Math.PI / 2 + (2 * Math.PI * percent / 100);
+  return 3 * Math.PI / 2 - (2 * Math.PI * percent / 100);
 }
 
 function screenCoord(p: Point, planeHeight: number): Point {
