@@ -1,5 +1,5 @@
 import { Entity } from '@akolos/ts-client-server-game-synchronization';
-import { DemoPlayerInput } from '../common/demo-server';
+import { DemoPlayerInput } from './demo-server';
 
 export const enum DemoInputType {
   Move = 'move',

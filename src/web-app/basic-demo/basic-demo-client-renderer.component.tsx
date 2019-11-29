@@ -1,12 +1,13 @@
 import React from 'react';
-import { DemoGameRendererComponent } from './game-renderer';
-import { DemoClientEntitySyncerRunner } from './demo-client-runner';
+import { DemoGameRendererComponent } from './basic-demo-game-renderer.component';
+import { BasicDemoClientEntitySyncerRunner } from './basic-demo-client-runner';
 import { BasicDemoPlayerState } from '../../basic-demo-implementation/player';
 import { Entity } from '@akolos/ts-client-server-game-synchronization';
 import { createPositionParagraphTags } from './create-position-paragraph-tags';
+import { RendererFrame } from '../common/renderer-frame.component';
 
 interface ClientRendererProps {
-  demoClientRunner: DemoClientEntitySyncerRunner;
+  demoClientRunner: BasicDemoClientEntitySyncerRunner;
   borderColor: string;
   title: JSX.Element;
 }
@@ -16,7 +17,7 @@ interface ClientRendererState {
   numberOfPendingInputs: number;
 }
 
-export class ClientRenderer extends React.Component<ClientRendererProps, ClientRendererState> {
+export class BasicDemoClientRenderer extends React.Component<ClientRendererProps, ClientRendererState> {
 
   constructor(props: ClientRendererProps) {
     super(props);
@@ -35,19 +36,14 @@ export class ClientRenderer extends React.Component<ClientRendererProps, ClientR
   }
 
   public render() {
-    const outerStyle = {
-      border: `5px solid ${this.props.borderColor}`,
-      padding: '15px',
-      margin: '15px',
-    };
 
     return (
-      <div style={outerStyle}>
+      <RendererFrame borderColor={this.props.borderColor}>
         {this.props.title}
         <DemoGameRendererComponent entities={this.state.entities} />
         {createPositionParagraphTags(this.state.entities)}
         <p>{`Non-acknowledged inputs: ${this.state.numberOfPendingInputs}`}</p>
-      </div>
+      </RendererFrame>
     );
   }
 }

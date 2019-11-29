@@ -1,43 +1,25 @@
 import { EntityInfo, EntityTargetedInput } from '@akolos/ts-client-server-game-synchronization';
 import { BasicDemoPlayerState, MoveInputDirection, BasicDemoPlayerInput } from './player';
+import { Stopwatch } from '../common/keyboard-input/stopwatch';
+import { KeyStateTracker } from '../common/keyboard-input/key-state-tracker';
 
-export interface KeyboardDemoinputCollectorKeycodes {
+export type KeyboardDemoinputCollectorKeycodes = {
   moveLeft: number;
   moveRight: number;
 }
 
 export const createKeyboardBasicDemoInputCollector = (keyMappings: KeyboardDemoinputCollectorKeycodes) => {
-  let lastCollectionTime: number;
+  const inputCollectionTimeWatch = new Stopwatch();
 
-  let leftKeyIsDown = false;
-  let rightKeyIsDown = false;
-
-  window.addEventListener('keydown', (e: KeyboardEvent) => {
-    if (e.keyCode === keyMappings.moveLeft) {
-      leftKeyIsDown = true;
-    }
-    if (e.keyCode === keyMappings.moveRight) {
-      rightKeyIsDown = true;
-    }
-  });
-  window.addEventListener('keyup', (e: KeyboardEvent) => {
-    if (e.keyCode === keyMappings.moveLeft) {
-      leftKeyIsDown = false;
-    }
-    if (e.keyCode === keyMappings.moveRight) {
-      rightKeyIsDown = false;
-    }
-  });
+  const keyStateTracker = new KeyStateTracker(keyMappings);
 
   const inputCollector = (entities: Array<EntityInfo<BasicDemoPlayerState>>) => {
-    const now = new Date().getTime();
-    const dt = lastCollectionTime != null ? now - lastCollectionTime : 0;
-    lastCollectionTime = now;
+    const dt = inputCollectionTimeWatch.reset();
+    const keyDownStates = keyStateTracker.getAllKeyDownStates();
 
-    const xor = (x: boolean, y: boolean) => (x && !y) || (!x && y);
     const inputs: Array<EntityTargetedInput<BasicDemoPlayerInput>> = [];
-    if (xor(leftKeyIsDown, rightKeyIsDown)) {
-      const direction = leftKeyIsDown ? MoveInputDirection.Backward : MoveInputDirection.Forward;
+    if (xor(keyDownStates.moveLeft, keyDownStates.moveRight)) {
+      const direction = keyDownStates.moveLeft ? MoveInputDirection.Backward : MoveInputDirection.Forward;
       const input: EntityTargetedInput<BasicDemoPlayerInput> = {
         entityId: entities.filter(e => e.local)[0].id,
         input: {
@@ -52,3 +34,7 @@ export const createKeyboardBasicDemoInputCollector = (keyMappings: KeyboardDemoi
 
   return inputCollector;
 };
+
+function xor(x: boolean, y: boolean) {
+  return (x && !y) || (!x && y);
+}

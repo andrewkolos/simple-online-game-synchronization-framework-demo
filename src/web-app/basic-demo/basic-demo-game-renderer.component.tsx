@@ -15,7 +15,7 @@ export class DemoGameRendererComponent extends React.Component<DemoGameRendererP
     this.canvasRef = React.createRef<HTMLCanvasElement>();
   }
 
-  public componentWillReceiveProps(props: DemoGameRendererProps) {
+  public componentDidUpdate(props: DemoGameRendererProps) {
     const canvas = this.canvasRef.current;
     if (canvas == null) return;
 

@@ -1,9 +1,10 @@
 import React from 'react';
-import { DemoGameRendererComponent } from './game-renderer';
+import { DemoGameRendererComponent } from './basic-demo-game-renderer.component';
 import { BasicDemoPlayerState, BasicDemoPlayerInput } from '../../basic-demo-implementation/player';
 import { Entity, ClientInfo } from '@akolos/ts-client-server-game-synchronization';
 import { createPositionParagraphTags } from './create-position-paragraph-tags';
-import { DemoSyncServer } from '../../common/demo-server';
+import { DemoSyncServer } from '../../basic-demo-implementation/demo-server';
+import { RendererFrame } from '../common/renderer-frame.component';
 
 interface ServerRendererProps {
   demoSyncServer: DemoSyncServer<BasicDemoPlayerState>;
@@ -11,8 +12,8 @@ interface ServerRendererProps {
 }
 
 interface ServerRendererState {
-  lastAckSeqNumbers: Array<{ clientId: string, lastAckSeqNumber: number }>;
   entities: Array<Entity<BasicDemoPlayerState>>;
+  lastAckSeqNumbers: Array<{clientId: string, lastAckSeqNumber: number}>;
 }
 
 export class ServerRenderer extends React.Component<ServerRendererProps, ServerRendererState> {
@@ -21,8 +22,8 @@ export class ServerRenderer extends React.Component<ServerRendererProps, ServerR
     super(props);
 
     this.state = {
-      lastAckSeqNumbers: [],
       entities: [],
+      lastAckSeqNumbers: [],
     };
 
     props.demoSyncServer.onSynchronized((entities: Array<Entity<BasicDemoPlayerState>>) => {
@@ -38,14 +39,9 @@ export class ServerRenderer extends React.Component<ServerRendererProps, ServerR
   }
 
   public render() {
-    const outerStyle = {
-      border: `5px solid ${this.props.borderColor}`,
-      padding: '15px',
-      margin: '15px',
-    };
 
     return (
-      <div style={outerStyle}>
+      <RendererFrame borderColor={this.props.borderColor}>
         <p>Server View</p>
         <DemoGameRendererComponent entities={this.state.entities} />
         {createPositionParagraphTags(this.state.entities)}
@@ -53,7 +49,7 @@ export class ServerRenderer extends React.Component<ServerRendererProps, ServerR
           Last acknowledged inputs:&nbsp;
           {this.state.lastAckSeqNumbers.map(({ clientId, lastAckSeqNumber }) => `${clientId}: ${lastAckSeqNumber} `)}
         </p>
-      </div>
+      </RendererFrame>
     );
   }
 }

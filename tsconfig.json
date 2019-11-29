@@ -21,6 +21,6 @@
     "declaration": false
   },
   "include": [
-    "src/web-app/bindex.tsx"
+    "src/web-app/index.tsx"
   ]
 }

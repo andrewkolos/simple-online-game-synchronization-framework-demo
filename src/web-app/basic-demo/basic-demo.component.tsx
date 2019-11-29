@@ -2,9 +2,9 @@ import React from 'react';
 import { InMemoryClientServerNetwork, InputMessage, StateMessage, ClientEntitySyncerRunner, PlayerClientEntitySyncer } from '@akolos/ts-client-server-game-synchronization';
 import { BasicDemoPlayerInput, BasicDemoPlayerState, demoPlayerInputApplicator } from '../../basic-demo-implementation/player';
 import { createKeyboardBasicDemoInputCollector, KeyboardDemoinputCollectorKeycodes } from '../../basic-demo-implementation/keyboard-demo-input-collector';
-import { ClientRenderer } from '../common/client-renderer-component';
-import { ServerRenderer } from '../common/server-renderer-component';
-import { DemoSyncServer } from '../../common/demo-server';
+import { BasicDemoClientRenderer } from './basic-demo-client-renderer.component';
+import { ServerRenderer } from './basic-demo-server-renderer.component';
+import { DemoSyncServer } from '../../basic-demo-implementation/demo-server';
 
 const SERVER_SYNC_UPDATE_RATE = 60;
 const CLIENT_UPDATE_RATE = 60;
@@ -13,12 +13,12 @@ const CLIENT_LATENCY_MS = 100;
 export class BasicDemo extends React.Component {
 
   private readonly server: DemoSyncServer<BasicDemoPlayerState>;
-  private readonly clients: Array<ClientEntitySyncerRunner<BasicDemoPlayerState, BasicDemoPlayerInput>>;
+  private readonly clients: Array<ClientEntitySyncerRunner<BasicDemoPlayerInput, BasicDemoPlayerState>>;
 
   public constructor(props: {}) {
     super(props);
 
-    const demoServer = new DemoSyncServer<BasicDemoPlayerState>((_entityId: string) => ({position: 0}), demoPlayerInputApplicator);
+    const demoServer = new DemoSyncServer<BasicDemoPlayerState>((_entityId: string) => ({ position: 0 }), demoPlayerInputApplicator);
     const network = new InMemoryClientServerNetwork<InputMessage<BasicDemoPlayerInput>, StateMessage<BasicDemoPlayerState>>();
 
     demoServer.addClient(network.getNewClientConnection());
@@ -44,10 +44,11 @@ export class BasicDemo extends React.Component {
 
     return (
       <div>
-        <ClientRenderer borderColor='blue' title={<p>Player One's view. Move with A and D keys</p>}
+        <BasicDemoClientRenderer borderColor='blue' title={<p>Player One's view. Move with A and D keys</p>}
           demoClientRunner={this.clients[0]} />
         <ServerRenderer borderColor='gray' demoSyncServer={this.server} />
-        <ClientRenderer borderColor='red' title={<p>Player Two's view. Move with arrow keys</p>} demoClientRunner={this.clients[1]} />
+        <BasicDemoClientRenderer borderColor='red' title={<p>Player Two's view. Move with arrow keys</p>}
+          demoClientRunner={this.clients[1]} />
       </div>
     );
   }

@@ -7,6 +7,7 @@ import {
   Link,
 } from 'react-router-dom';
 import { BasicDemo } from './basic-demo/basic-demo.component';
+import { LcDemo } from './lag-compensation-demo/lc-demo.component';
 
 const App = () => (
   <Router>
@@ -26,7 +27,7 @@ const App = () => (
           <BasicDemo />
         </Route>
         <Route path='/lagCompensationDemo'>
-          hello
+          <LcDemo />
         </Route>
       </Switch>
     </div>

@@ -46,6 +46,7 @@
       }
     ],
     "no-parameter-reassignment": true,
-    "align": false
+    "align": false,
+    "interface-over-type-literal": false
   }
 }
