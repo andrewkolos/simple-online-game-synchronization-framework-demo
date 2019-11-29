@@ -2,8 +2,8 @@ import React from 'react';
 import { InMemoryClientServerNetwork, InputMessage, StateMessage, ClientEntitySyncerRunner, PlayerClientEntitySyncer } from '@akolos/ts-client-server-game-synchronization';
 import { BasicDemoPlayerInput, BasicDemoPlayerState, demoPlayerInputApplicator } from '../../basic-demo-implementation/player';
 import { createKeyboardBasicDemoInputCollector, KeyboardDemoinputCollectorKeycodes } from '../../basic-demo-implementation/keyboard-demo-input-collector';
-import { BasicDemoClientRenderer } from './basic-demo-client-renderer.component';
-import { ServerRenderer } from './basic-demo-server-renderer.component';
+import { BasicDemoClientRenderer } from './basic-demo-client-renderer';
+import { ServerRenderer } from './basic-demo-server-renderer';
 import { DemoSyncServer } from '../../basic-demo-implementation/demo-server';
 
 const SERVER_SYNC_UPDATE_RATE = 60;

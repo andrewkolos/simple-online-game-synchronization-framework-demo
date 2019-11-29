@@ -6,7 +6,7 @@ interface DemoGameRendererProps {
   entities: Array<Entity<BasicDemoPlayerState>>;
 };
 
-export class DemoGameRendererComponent extends React.Component<DemoGameRendererProps> {
+export class DemoGameRenderer extends React.Component<DemoGameRendererProps> {
 
   private canvasRef: RefObject<HTMLCanvasElement>;
 

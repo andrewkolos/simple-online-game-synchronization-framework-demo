@@ -2,7 +2,7 @@ import React from 'react';
 import { LcDemoClient } from '../../lag-compensation-demo/lc-demo-client';
 import { LcDemoGameState } from '../../lag-compensation-demo/lc-demo-game-state';
 import { RendererFrame } from '../common/renderer-frame.component';
-import { LcDemoGameRendererComponent } from './lc-demo-game-renderer.component';
+import { LcDemoGameRendererComponent } from './lc-demo-game-renderer';
 
 interface LcDemoClientRendererProps {
   title: JSX.Element;

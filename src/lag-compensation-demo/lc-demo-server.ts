@@ -1,12 +1,12 @@
-import { LcDemoGameState } from './lc-demo-game-state';
-import { LcDemoGameConfig } from './lc-demo-game-config';
-import { TwoWayMessageBuffer, ServerEntitySyncer, InputMessage, StateMessage, Entity } from '@akolos/ts-client-server-game-synchronization';
-import { LcDemoPlayerInput, LcDemoPlayerState } from './player';
-import { IntervalTaskRunner, Interval } from 'interval-task-runner';
+import { Entity, InputMessage, ServerEntitySyncer, StateMessage, TwoWayMessageBuffer } from '@akolos/ts-client-server-game-synchronization';
+import { Interval, IntervalTaskRunner } from 'interval-task-runner';
 import { EventEmitter } from 'typed-event-emitter';
-import { writeLcDemoEntityStatesToGame } from './write-lc-demo-entity-states-to-game';
-import { lcDemoPlayerInputApplicator } from './lc-demo-player-input-applicator';
 import { LcDemoEntityId } from './lc-demo-entity-ids';
+import { LcDemoGameConfig } from './lc-demo-game-config';
+import { LcDemoGameState } from './lc-demo-game-state';
+import { lcDemoPlayerInputApplicator } from './lc-demo-player-input-applicator';
+import { LcDemoPlayerInput, LcDemoPlayerState } from './player';
+import { writeLcDemoEntityStatesToGame } from './write-lc-demo-entity-states-to-game';
 
 enum LcDemoClientId {
   P1 = 'P1',

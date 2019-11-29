@@ -1,5 +1,5 @@
 import React from 'react';
-import { DemoGameRendererComponent } from './basic-demo-game-renderer.component';
+import { DemoGameRenderer } from './basic-demo-game-renderer';
 import { BasicDemoPlayerState, BasicDemoPlayerInput } from '../../basic-demo-implementation/player';
 import { Entity, ClientInfo } from '@akolos/ts-client-server-game-synchronization';
 import { createPositionParagraphTags } from './create-position-paragraph-tags';
@@ -43,7 +43,7 @@ export class ServerRenderer extends React.Component<ServerRendererProps, ServerR
     return (
       <RendererFrame borderColor={this.props.borderColor}>
         <p>Server View</p>
-        <DemoGameRendererComponent entities={this.state.entities} />
+        <DemoGameRenderer entities={this.state.entities} />
         {createPositionParagraphTags(this.state.entities)}
         <p>
           Last acknowledged inputs:&nbsp;

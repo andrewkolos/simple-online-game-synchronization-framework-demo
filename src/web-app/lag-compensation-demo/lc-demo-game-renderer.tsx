@@ -2,6 +2,7 @@ import React, { RefObject } from 'react';
 import { LcDemoGameState, PlayerId } from '../../lag-compensation-demo/lc-demo-game-state';
 import { Point, Polygon } from '../../lag-compensation-demo/misc/geomtry';
 import { lineSegment } from '../common/geometry-drawer';
+import { LcDemoEntityId } from '../../lag-compensation-demo/lc-demo-entity-ids';
 
 interface DemoGameRendererProps {
   game: LcDemoGameState;
@@ -30,13 +31,13 @@ export class LcDemoGameRendererComponent extends React.Component<DemoGameRendere
     ctx.fillRect(0, 0, playfieldHeight, playfieldWidth);
 
     const playerColors = {
-      p0: 'blue',
-      p1: 'red',
+      [LcDemoEntityId.P1]: 'blue',
+      [LcDemoEntityId.P2]: 'red',
     };
 
     const laserColors = {
-      p0: 'cyan',
-      p1: 'yellow',
+      [LcDemoEntityId.P1]: 'cyan',
+      [LcDemoEntityId.P2]: 'yellow',
     };
 
     [{ id: PlayerId.P1, player: game.player1 }, { id: PlayerId.P2, player: game.player2 }].forEach((o) => {
@@ -59,7 +60,7 @@ export class LcDemoGameRendererComponent extends React.Component<DemoGameRendere
       (function renderLaser() {
         if (player.timeUntilSpawnMs === 0) {
           lineSegment(ctx, screenCoords(laser.p), screenCoords(laser.q));
-          ctx.lineWidth = 2;
+          ctx.lineWidth = 1;
           ctx.strokeStyle = (laserColors as any)[id];
           ctx.stroke();
         }

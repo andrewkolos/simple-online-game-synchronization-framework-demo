@@ -1,5 +1,5 @@
 import React from 'react';
-import { LcDemoGameRendererComponent } from './lc-demo-game-renderer.component';
+import { LcDemoGameRendererComponent } from './lc-demo-game-renderer';
 import { LcDemoGameServer } from '../../lag-compensation-demo/lc-demo-server';
 import { RendererFrame } from '../common/renderer-frame.component';
 import { LcDemoGameState } from '../../lag-compensation-demo/lc-demo-game-state';

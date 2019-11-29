@@ -1,5 +1,5 @@
 import React from 'react';
-import { DemoGameRendererComponent } from './basic-demo-game-renderer.component';
+import { DemoGameRenderer } from './basic-demo-game-renderer';
 import { BasicDemoClientEntitySyncerRunner } from './basic-demo-client-runner';
 import { BasicDemoPlayerState } from '../../basic-demo-implementation/player';
 import { Entity } from '@akolos/ts-client-server-game-synchronization';
@@ -40,7 +40,7 @@ export class BasicDemoClientRenderer extends React.Component<ClientRendererProps
     return (
       <RendererFrame borderColor={this.props.borderColor}>
         {this.props.title}
-        <DemoGameRendererComponent entities={this.state.entities} />
+        <DemoGameRenderer entities={this.state.entities} />
         {createPositionParagraphTags(this.state.entities)}
         <p>{`Non-acknowledged inputs: ${this.state.numberOfPendingInputs}`}</p>
       </RendererFrame>
