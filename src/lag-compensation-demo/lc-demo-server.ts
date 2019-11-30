@@ -1,4 +1,4 @@
-import { Entity, InputMessage, ServerEntitySyncer, StateMessage, TwoWayMessageBuffer } from '@akolos/ts-client-server-game-synchronization';
+import { Entity, InputMessage, ServerEntitySyncer, StateMessage, TwoWayMessageBuffer, cloneDumbObject } from '@akolos/ts-client-server-game-synchronization';
 import { Interval, IntervalTaskRunner } from 'interval-task-runner';
 import { EventEmitter } from 'typed-event-emitter';
 import { LcDemoEntityId } from './lc-demo-entity-ids';
@@ -7,6 +7,7 @@ import { LcDemoGameState } from './lc-demo-game-state';
 import { lcDemoPlayerInputApplicator } from './lc-demo-player-input-applicator';
 import { LcDemoPlayerInput, LcDemoPlayerState } from './player';
 import { writeLcDemoEntityStatesToGame } from './write-lc-demo-entity-states-to-game';
+import { makeLcDemoinputValidator} from './lc-demo-input-validator';
 
 enum LcDemoClientId {
   P1 = 'P1',
@@ -50,9 +51,7 @@ export class LcDemoGameServer extends EventEmitter {
         }
       },
       inputApplicator: lcDemoPlayerInputApplicator,
-      inputValidator: (entity: Entity<LcDemoPlayerState>, _input: LcDemoPlayerInput) => {
-        return entity.state.timeUntilSpawnMs <= 0;
-      },
+      inputValidator: makeLcDemoinputValidator(),
     });
   }
 
@@ -71,7 +70,7 @@ export class LcDemoGameServer extends EventEmitter {
     const pid = LcDemoClientId.getEntityId(cid);
     this.entitySyncer.addPlayerEntity({
       id: pid,
-      state: cid === LcDemoClientId.P1 ? this.game.player1 : this.game.player2,
+      state: cid === LcDemoClientId.P1 ? cloneDumbObject(this.game.player1) : cloneDumbObject(this.game.player2),
     }, cid);
   }
 
@@ -80,6 +79,16 @@ export class LcDemoGameServer extends EventEmitter {
     writeLcDemoEntityStatesToGame(updatedEntities, this.game);
     this.game.advanceSpawnTimers(Interval.fromHz(this.updateRateHz).ms);
     this.game.performLaserCollisions();
+    this.writeSpawnTimersToEntities();
     this.emit(this.onUpdated, this.game);
+  }
+
+  private writeSpawnTimersToEntities() {
+    this.entitySyncer.setEntityState(LcDemoEntityId.P1, {
+      timeUntilSpawnMs: this.game.player1.timeUntilSpawnMs,
+    });
+    this.entitySyncer.setEntityState(LcDemoEntityId.P2, {
+      timeUntilSpawnMs: this.game.player2.timeUntilSpawnMs,
+    });
   }
 }

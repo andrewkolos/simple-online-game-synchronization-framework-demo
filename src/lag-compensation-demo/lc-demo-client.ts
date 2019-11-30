@@ -7,6 +7,7 @@ import { LcDemoGameState } from './lc-demo-game-state';
 import { lcDemoPlayerInputApplicator } from './lc-demo-player-input-applicator';
 import { LcDemoPlayerInput, LcDemoPlayerState } from './player';
 import { writeLcDemoEntityStatesToGame } from './write-lc-demo-entity-states-to-game';
+import { makeLcDemoinputValidator } from './lc-demo-input-validator';
 
 export interface LcDemoClientSyncArgs {
   syncRateHz: number;
@@ -34,6 +35,7 @@ export class LcDemoClient extends EventEmitter {
       connection: syncArgs.connectionToServer,
       localPlayerInputStrategy: {
         inputSource: createKeyboardLcDemoInputCollector(syncArgs.keyMappings),
+        inputValidator: makeLcDemoinputValidator(),
         inputApplicator: lcDemoPlayerInputApplicator,
       },
       serverUpdateRateHz: syncArgs.serverUpdateRateHz,

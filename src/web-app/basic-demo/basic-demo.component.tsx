@@ -64,6 +64,7 @@ function createClient(keyMappings: KeyboardDemoinputCollectorKeycodes,
     localPlayerInputStrategy: {
       inputApplicator: demoPlayerInputApplicator,
       inputSource: inputCollector,
+      inputValidator: () => true,
     },
     serverUpdateRateHz: SERVER_SYNC_UPDATE_RATE,
   });
