@@ -1,4 +1,4 @@
-import { PlayerClientEntitySyncer, PlayerClientSyncerConnectionToServer } from '@akolos/ts-client-server-game-synchronization';
+import { PlayerClientEntitySyncer, PlayerConnectionToServer } from '@akolos/ts-client-server-game-synchronization';
 import { Interval, IntervalTaskRunner } from 'interval-task-runner';
 import { EventEmitter } from 'typed-event-emitter';
 import { createKeyboardLcDemoInputCollector, LcKeyboardDemoInputCollectorKeycodes } from './keyboard-LC-demo-input-collector';
@@ -11,7 +11,7 @@ import { makeLcDemoinputValidator } from './lc-demo-input-validator';
 
 export interface LcDemoClientSyncArgs {
   syncRateHz: number;
-  connectionToServer: PlayerClientSyncerConnectionToServer<LcDemoPlayerInput, LcDemoPlayerState>;
+  connectionToServer: PlayerConnectionToServer<LcDemoPlayerInput, LcDemoPlayerState>;
   keyMappings: LcKeyboardDemoInputCollectorKeycodes;
   serverUpdateRateHz: number;
 }

@@ -1,4 +1,4 @@
-import { TwoWayMessageBuffer, InputMessage, StateMessage, Entity, ServerEntitySyncer, ServerEntitySyncerRunner, ClientInfo, InputApplicator, NumericObject } from '@akolos/ts-client-server-game-synchronization';
+import { TwoWayMessageBuffer, InputMessage, StateMessage, Entity, ServerEntitySyncer, ServerEntitySyncerRunner, InputApplicator, NumericObject, OnServerSynchronizedEvent } from '@akolos/ts-client-server-game-synchronization';
 import { EventEmitter } from 'typed-event-emitter';
 
 export interface DemoPlayerInput {
@@ -16,7 +16,7 @@ type StateAssigner<PlayerState> = (entityId: string) => PlayerState;
 
 export class DemoSyncServer<PlayerState extends NumericObject> extends EventEmitter {
 
-  public readonly onSynchronized = this.registerEvent<(entities: ReadonlyArray<Entity<PlayerState>>) => void>();
+  public readonly onSynchronized = this.registerEvent<(e: OnServerSynchronizedEvent<DemoPlayerInput, PlayerState>) => void>();
   private players: Array<Entity<PlayerState>> = [];
   private playerMovementInfos: PlayerMovementInfo[] = [];
   private syncer: ServerEntitySyncer<DemoPlayerInput, PlayerState>;
@@ -30,13 +30,13 @@ export class DemoSyncServer<PlayerState extends NumericObject> extends EventEmit
     this.inputApplicator = inputApplicator;
 
     this.syncer = new ServerEntitySyncer({
-      clientIdAssigner: () => this.getIdForNewClient(),
       inputApplicator: this.inputApplicator as InputApplicator<DemoPlayerInput, PlayerState>,
       inputValidator: (entity: Entity<PlayerState>, input: DemoPlayerInput) => this.validateInput(entity, input),
+      clientIdAssigner: () => this.getIdForNewClient(),
     });
 
     this.syncerRunner = new ServerEntitySyncerRunner(this.syncer);
-    this.syncerRunner.onSynchronized((entities: ReadonlyArray<Entity<PlayerState>>) => this.emit(this.onSynchronized, entities));
+    this.syncerRunner.onSynchronized((e) => this.emit(this.onSynchronized, e));
 
   }
 
@@ -63,12 +63,6 @@ export class DemoSyncServer<PlayerState extends NumericObject> extends EventEmit
 
   public stop() {
     this.syncerRunner.stop();
-  }
-
-  public getClientInformation(): ReadonlyMap<string, ClientInfo<DemoPlayerInput, PlayerState>>;
-  public getClientInformation(clientId: string): ClientInfo<DemoPlayerInput, PlayerState>;
-  public getClientInformation(clientId?: string) {
-    return clientId == null ? this.syncer.getClientInformation() : this.syncer.getClientInformation(clientId);
   }
 
   private getIdForNewClient(): string {

@@ -1,7 +1,7 @@
 import React from 'react';
 import { DemoGameRenderer } from './basic-demo-game-renderer';
 import { BasicDemoPlayerState, BasicDemoPlayerInput } from '../../basic-demo-implementation/player';
-import { Entity, ClientInfo } from '@akolos/ts-client-server-game-synchronization';
+import { Entity, OnServerSynchronizedEvent, OnServerSynchronzedEventClientInfo } from '@akolos/ts-client-server-game-synchronization';
 import { createPositionParagraphTags } from './create-position-paragraph-tags';
 import { DemoSyncServer } from '../../basic-demo-implementation/demo-server';
 import { RendererFrame } from '../common/renderer-frame.component';
@@ -25,14 +25,12 @@ export class ServerRenderer extends React.Component<ServerRendererProps, ServerR
       entities: [],
       lastAckSeqNumbers: [],
     };
-
-    props.demoSyncServer.onSynchronized((entities: Array<Entity<BasicDemoPlayerState>>) => {
-      const clientInfo = Array.from(this.props.demoSyncServer.getClientInformation().values());
+    props.demoSyncServer.onSynchronized((ev: OnServerSynchronizedEvent<BasicDemoPlayerInput, BasicDemoPlayerState>) => {
       this.setState({
-        entities,
-        lastAckSeqNumbers: clientInfo.map((client: ClientInfo<BasicDemoPlayerInput, BasicDemoPlayerState>) => ({
-          clientId: client.id,
-          lastAckSeqNumber: client.seqNumberOfLastProcessedInput,
+        entities: ev.entities as Array<Entity<BasicDemoPlayerState>>,
+        lastAckSeqNumbers: ev.clientInformation.map((ci: OnServerSynchronzedEventClientInfo) => ({
+          clientId: ci.id,
+          lastAckSeqNumber: ci.lastAckInputSeqNumber,
         })),
       });
     });
