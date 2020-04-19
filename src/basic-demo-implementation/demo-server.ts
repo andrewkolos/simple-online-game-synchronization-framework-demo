@@ -1,5 +1,6 @@
-import { TwoWayMessageBuffer, InputMessage, StateMessage, Entity, ServerEntitySyncer, ServerEntitySyncerRunner, InputApplicator, NumericObject, OnServerSynchronizedEvent } from '@akolos/ts-client-server-game-synchronization';
+import { TwoWayMessageBuffer, InputMessage, StateMessage, Entity, ServerEntitySyncer, ServerEntitySyncerRunner, InputApplicator, OnServerSynchronizedEvent } from '@akolos/ts-client-server-game-synchronization';
 import { EventEmitter } from 'typed-event-emitter';
+import { BasicDemoPlayerState } from './player';
 
 export interface DemoPlayerInput {
   pressTime: number;
@@ -14,24 +15,24 @@ interface PlayerMovementInfo {
 
 type StateAssigner<PlayerState> = (entityId: string) => PlayerState;
 
-export class DemoSyncServer<PlayerState extends NumericObject> extends EventEmitter {
+export class DemoSyncServer extends EventEmitter {
 
-  public readonly onSynchronized = this.registerEvent<(e: OnServerSynchronizedEvent<DemoPlayerInput, PlayerState>) => void>();
-  private players: Array<Entity<PlayerState>> = [];
+  public readonly onSynchronized = this.registerEvent<(e: OnServerSynchronizedEvent<DemoPlayerInput, BasicDemoPlayerState>) => void>();
+  private players: Array<Entity<BasicDemoPlayerState>> = [];
   private playerMovementInfos: PlayerMovementInfo[] = [];
-  private syncer: ServerEntitySyncer<DemoPlayerInput, PlayerState>;
-  private stateAssigner: StateAssigner<PlayerState>;
-  private inputApplicator: InputApplicator<DemoPlayerInput, PlayerState>;
-  private syncerRunner: ServerEntitySyncerRunner<DemoPlayerInput, PlayerState>;
+  private syncer: ServerEntitySyncer<DemoPlayerInput, BasicDemoPlayerState>;
+  private stateAssigner: StateAssigner<BasicDemoPlayerState>;
+  private inputApplicator: InputApplicator<DemoPlayerInput, BasicDemoPlayerState>;
+  private syncerRunner: ServerEntitySyncerRunner<DemoPlayerInput, BasicDemoPlayerState>;
 
-  public constructor(newEntityStateAssigner: StateAssigner<PlayerState>, inputApplicator: InputApplicator<DemoPlayerInput, PlayerState>) {
+  public constructor(newEntityStateAssigner: StateAssigner<BasicDemoPlayerState>, inputApplicator: InputApplicator<DemoPlayerInput, BasicDemoPlayerState>) {
     super();
     this.stateAssigner = newEntityStateAssigner;
     this.inputApplicator = inputApplicator;
 
     this.syncer = new ServerEntitySyncer({
-      inputApplicator: this.inputApplicator as InputApplicator<DemoPlayerInput, PlayerState>,
-      inputValidator: (entity: Entity<PlayerState>, input: DemoPlayerInput) => this.validateInput(entity, input),
+      inputApplicator: this.inputApplicator as InputApplicator<DemoPlayerInput, BasicDemoPlayerState>,
+      inputValidator: (entity: Entity<BasicDemoPlayerState>, input: DemoPlayerInput) => this.validateInput(entity, input),
       clientIdAssigner: () => this.getIdForNewClient(),
     });
 
@@ -40,11 +41,11 @@ export class DemoSyncServer<PlayerState extends NumericObject> extends EventEmit
 
   }
 
-  public addClient(connection: TwoWayMessageBuffer<InputMessage<DemoPlayerInput>, StateMessage<PlayerState>>): string {
+  public addClient(connection: TwoWayMessageBuffer<InputMessage<DemoPlayerInput>, StateMessage<BasicDemoPlayerState>>): string {
     const clientId = this.syncer.connectClient(connection);
     const newEntityid = clientId;
 
-    const newPlayer: Entity<PlayerState> = { id: clientId, state: this.stateAssigner(newEntityid) };
+    const newPlayer: Entity<BasicDemoPlayerState> = { id: clientId, state: this.stateAssigner(newEntityid) };
     this.players.push(newPlayer);
     this.syncer.addPlayerEntity(newPlayer, clientId);
     this.playerMovementInfos.push({
@@ -69,7 +70,7 @@ export class DemoSyncServer<PlayerState extends NumericObject> extends EventEmit
     return `c${this.players.length}`;
   }
 
-  private validateInput(entity: Entity<PlayerState>, input: DemoPlayerInput) {
+  private validateInput(entity: Entity<BasicDemoPlayerState>, input: DemoPlayerInput) {
     if ((input as DemoPlayerInput).pressTime != null) {
       const demoPlayerInput = input as DemoPlayerInput;
       const player = this.playerMovementInfos.find((info: PlayerMovementInfo) => {

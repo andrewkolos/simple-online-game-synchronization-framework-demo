@@ -12,13 +12,13 @@ const CLIENT_LATENCY_MS = 100;
 
 export class BasicDemo extends React.Component {
 
-  private readonly server: DemoSyncServer<BasicDemoPlayerState>;
+  private readonly server: DemoSyncServer;
   private readonly clients: Array<ClientEntitySyncerRunner<BasicDemoPlayerInput, BasicDemoPlayerState>>;
 
   public constructor(props: {}) {
     super(props);
 
-    const demoServer = new DemoSyncServer<BasicDemoPlayerState>((_entityId: string) => ({ position: 0 }), demoPlayerInputApplicator);
+    const demoServer = new DemoSyncServer((_entityId: string) => ({ position: 0 }), demoPlayerInputApplicator);
     const network = new InMemoryClientServerNetwork<InputMessage<BasicDemoPlayerInput>, StateMessage<BasicDemoPlayerState>>();
 
     demoServer.addClient(network.getNewClientConnection());

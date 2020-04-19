@@ -1,13 +1,13 @@
 import React from 'react';
 import { DemoGameRenderer } from './basic-demo-game-renderer';
 import { BasicDemoPlayerState, BasicDemoPlayerInput } from '../../basic-demo-implementation/player';
-import { Entity, OnServerSynchronizedEvent, OnServerSynchronzedEventClientInfo } from '@akolos/ts-client-server-game-synchronization';
+import { Entity, OnServerSynchronizedEvent } from '@akolos/ts-client-server-game-synchronization';
 import { createPositionParagraphTags } from './create-position-paragraph-tags';
 import { DemoSyncServer } from '../../basic-demo-implementation/demo-server';
 import { RendererFrame } from '../common/renderer-frame.component';
 
 interface ServerRendererProps {
-  demoSyncServer: DemoSyncServer<BasicDemoPlayerState>;
+  demoSyncServer: DemoSyncServer;
   borderColor: string;
 }
 
@@ -27,10 +27,10 @@ export class ServerRenderer extends React.Component<ServerRendererProps, ServerR
     };
     props.demoSyncServer.onSynchronized((ev: OnServerSynchronizedEvent<BasicDemoPlayerInput, BasicDemoPlayerState>) => {
       this.setState({
-        entities: ev.entities as Array<Entity<BasicDemoPlayerState>>,
-        lastAckSeqNumbers: ev.clientInformation.map((ci: OnServerSynchronzedEventClientInfo) => ({
-          clientId: ci.id,
-          lastAckSeqNumber: ci.lastAckInputSeqNumber,
+        entities: ev.getEntities().asArray(),
+        lastAckSeqNumbers: [...ev.getLastAckInputSeqNumbers().entries()].map((e: [string, number]) => ({
+          clientId: e[0],
+          lastAckSeqNumber: e[1],
         })),
       });
     });
