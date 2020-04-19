@@ -1,11 +1,12 @@
 import { LcMoveInputDirection, LcRotateInputDirection, LcDemoPlayerState, LcDemoPlayerInput } from './player';
+import { Entity } from '@akolos/ts-client-server-game-synchronization';
 
-export const lcDemoPlayerInputApplicator = (currentState: LcDemoPlayerState, input: LcDemoPlayerInput): LcDemoPlayerState => {
+export const lcDemoPlayerInputApplicator = (entity: Entity<LcDemoPlayerState>, input: LcDemoPlayerInput): LcDemoPlayerState => {
   const MOVE_SPEED = 0.1;
   const TURN_SPEED = Math.PI / 1000 / 8;
 
-  const currentPosition = currentState.yOffset;
-  const currentRotation = currentState.rotationRads;
+  const currentPosition = entity.state.yOffset;
+  const currentRotation = entity.state.rotationRads;
 
   const stateAfterInput: LcDemoPlayerState = {
     yOffset: currentPosition,

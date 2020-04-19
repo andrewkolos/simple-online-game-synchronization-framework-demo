@@ -1,7 +1,7 @@
 import React from 'react';
 import { DemoGameRenderer } from './basic-demo-game-renderer';
-import { BasicDemoPlayerState, BasicDemoPlayerInput } from '../../basic-demo-implementation/player';
-import { Entity, OnServerSynchronizedEvent } from '@akolos/ts-client-server-game-synchronization';
+import { BasicDemoPlayerState } from '../../basic-demo-implementation/player';
+import { Entity } from '@akolos/ts-client-server-game-synchronization';
 import { createPositionParagraphTags } from './create-position-paragraph-tags';
 import { DemoSyncServer } from '../../basic-demo-implementation/demo-server';
 import { RendererFrame } from '../common/renderer-frame.component';
@@ -13,7 +13,6 @@ interface ServerRendererProps {
 
 interface ServerRendererState {
   entities: Array<Entity<BasicDemoPlayerState>>;
-  lastAckSeqNumbers: Array<{clientId: string, lastAckSeqNumber: number}>;
 }
 
 export class ServerRenderer extends React.Component<ServerRendererProps, ServerRendererState> {
@@ -23,15 +22,10 @@ export class ServerRenderer extends React.Component<ServerRendererProps, ServerR
 
     this.state = {
       entities: [],
-      lastAckSeqNumbers: [],
     };
-    props.demoSyncServer.onSynchronized((ev: OnServerSynchronizedEvent<BasicDemoPlayerInput, BasicDemoPlayerState>) => {
+    props.demoSyncServer.onSynchronized(e => {
       this.setState({
-        entities: ev.getEntities().asArray(),
-        lastAckSeqNumbers: [...ev.getLastAckInputSeqNumbers().entries()].map((e: [string, number]) => ({
-          clientId: e[0],
-          lastAckSeqNumber: e[1],
-        })),
+        entities: e
       });
     });
   }
@@ -43,10 +37,6 @@ export class ServerRenderer extends React.Component<ServerRendererProps, ServerR
         <p>Server View</p>
         <DemoGameRenderer entities={this.state.entities} />
         {createPositionParagraphTags(this.state.entities)}
-        <p>
-          Last acknowledged inputs:&nbsp;
-          {this.state.lastAckSeqNumbers.map(({ clientId, lastAckSeqNumber }) => `${clientId}: ${lastAckSeqNumber} `)}
-        </p>
       </RendererFrame>
     );
   }

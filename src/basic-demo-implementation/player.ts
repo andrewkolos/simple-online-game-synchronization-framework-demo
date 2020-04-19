@@ -19,10 +19,10 @@ export interface BasicDemoPlayerInput extends DemoPlayerInput {
   direction: MoveInputDirection;
 }
 
-export const demoPlayerInputApplicator = (currentState: BasicDemoPlayerState, input: BasicDemoPlayerInput): BasicDemoPlayerState => {
+export const demoPlayerInputApplicator = (entity: Entity<BasicDemoPlayerState>, input: BasicDemoPlayerInput): BasicDemoPlayerState => {
   const MOVE_SPEED = 0.2;
 
-  const currentPosition = currentState.position;
+  const currentPosition = entity.state.position;
   switch (input.direction) {
     case MoveInputDirection.Forward:
       return { position: currentPosition + (input.pressTime * MOVE_SPEED) };

@@ -18,7 +18,7 @@ export class BasicDemo extends React.Component {
   public constructor(props: {}) {
     super(props);
 
-    const demoServer = new DemoSyncServer((_entityId: string) => ({ position: 0 }), demoPlayerInputApplicator);
+    const demoServer = new DemoSyncServer();
     const network = new InMemoryClientServerNetwork<InputMessage<BasicDemoPlayerInput>, StateMessage<BasicDemoPlayerState>>();
 
     demoServer.addClient(network.getNewClientConnection());
